@@ -53,16 +53,31 @@ app.post('/api/auth/login', async (req, res) => {
 // Update passwords (admin only - you'd call this manually to change passwords)
 app.post('/api/auth/update-password', async (req, res) => {
   try {
-    const { role, newPassword } = req.body;
+    const { role, oldPassword, newPassword } = req.body;
     
-    const passwordHash = await bcrypt.hash(newPassword, 10);
+    if (!role || !oldPassword || !newPassword) {
+      return res.status(400).json({ error: 'Role, old password, and new password are required' });
+    }
+    
+    // Verify old password
+    const passwordRecord = await Password.findOne({ role });
+    if (!passwordRecord) {
+      return res.status(404).json({ error: 'Password not found for this role' });
+    }
+    
+    const isValidOldPassword = await bcrypt.compare(oldPassword, passwordRecord.passwordHash);
+    if (!isValidOldPassword) {
+      return res.status(401).json({ error: 'Old password is incorrect' });
+    }
+    
+    // Hash and update new password
+    const newPasswordHash = await bcrypt.hash(newPassword, 10);
     await Password.findOneAndUpdate(
       { role },
-      { passwordHash },
-      { upsert: true }
+      { passwordHash: newPasswordHash }
     );
     
-    res.json({ success: true, message: `${role} password updated` });
+    res.json({ success: true, message: `${role} password updated successfully` });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

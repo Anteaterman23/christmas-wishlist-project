@@ -5,6 +5,103 @@
   color-scheme: light only;
 }
 
+/* Christmas-themed animations */
+@keyframes snowfall {
+  0% {
+    background-position: 0px 0px, 0px 0px, 0px 0px;
+  }
+  100% {
+    background-position: 500px 1000px, 400px 400px, 300px 300px;
+  }
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Subtle snowflake background for the app */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, #cbd5e1, transparent),
+    radial-gradient(2px 2px at 60px 70px, #cbd5e1, transparent),
+    radial-gradient(1px 1px at 50px 50px, #cbd5e1, transparent),
+    radial-gradient(1px 1px at 130px 80px, #cbd5e1, transparent),
+    radial-gradient(2px 2px at 80px 10px, #cbd5e1, transparent);
+  background-size: 200px 200px, 300px 300px, 150px 150px, 250px 250px, 180px 180px;
+  background-repeat: repeat;
+  opacity: 0.4;
+  animation: snowfall 20s linear infinite;
+}
+
+/* Christmas lights effect for header */
+.bg-green-700 {
+  background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important;
+  position: relative;
+}
+
+/* Festive button hover effects */
+button.bg-green-600:hover {
+  box-shadow: 0 0 15px rgba(22, 163, 74, 0.4);
+  transform: translateY(-1px);
+}
+
+button.bg-red-600:hover {
+  box-shadow: 0 0 15px rgba(220, 38, 38, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Add subtle festive border to cards */
+.bg-white.rounded-lg.shadow {
+  border: 1px solid rgba(220, 38, 38, 0.1);
+  box-shadow: 0 1px 3px 0 rgba(220, 38, 38, 0.1), 0 1px 2px 0 rgba(34, 197, 94, 0.06);
+}
+
+/* Christmas ornament decorations on table headers */
+thead.bg-gray-100 {
+  background: linear-gradient(to right, #f3f4f6 0%, #fef2f2 50%, #f3f4f6 100%) !important;
+}
+
+/* Festive color for purchased items */
+tr.bg-red-50 {
+  background: linear-gradient(to right, #fef2f2 0%, #fee2e2 100%) !important;
+}
+
+/* Add candy cane stripes to loading states (subtle) */
+button:disabled {
+  background: repeating-linear-gradient(
+    45deg,
+    #d1d5db,
+    #d1d5db 10px,
+    #e5e7eb 10px,
+    #e5e7eb 20px
+  ) !important;
+}
+
+/* Festive success states */
+.text-green-600 {
+  color: #15803d !important;
+  font-weight: 500;
+}
+
+/* Christmas card style for user cards */
+.grid > div.bg-white {
+  background: linear-gradient(135deg, #ffffff 0%, #fef9f3 100%) !important;
+  border-left: 3px solid #dc2626;
+}
+
 /* Reset and base styles */
 body, html, #root {
   margin: 0;

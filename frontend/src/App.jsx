@@ -1,49 +1,136 @@
-import './App.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Plus, ArrowLeft } from 'lucide-react';
+import './App.css';
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const WishlistApp = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [activeTab, setActiveTab] = useState('myWishlist');
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
+  const [loading, setLoading] = useState(false);
   
-  const [users, setUsers] = useState([
-    { id: '1', name: 'Tyler', wishlistCount: 2 },
-    { id: '2', name: 'Sarah', wishlistCount: 3 },
-    { id: '3', name: 'Mike', wishlistCount: 1 },
-  ]);
-  
-  const [myWishlist, setMyWishlist] = useState([
-    { id: '1', name: 'New backpack', link: 'https://solo-ny.com/products/grand-travel-tsa-backpack', comments: 'I prefer either the red or blue color' },
-    { id: '2', name: 'Coffee maker', link: '', comments: '' },
-  ]);
-  
-  const [otherWishlist, setOtherWishlist] = useState([
-    { id: '1', name: 'Headphones', link: 'https://example.com', comments: 'Noise cancelling preferred', purchased: false, purchasedBy: null },
-    { id: '2', name: 'Book set', link: '', comments: '', purchased: true, purchasedBy: 'Tyler' },
-  ]);
+  const [users, setUsers] = useState([]);
+  const [myWishlist, setMyWishlist] = useState([]);
+  const [otherWishlist, setOtherWishlist] = useState([]);
   
   const [formData, setFormData] = useState({ name: '', link: '', comments: '', userName: '' });
   const [loginData, setLoginData] = useState({ password: '', selectedUser: '' });
 
-  const handleLogin = () => {
-    const userPassword = 'user123';
-    const adminPassword = 'admin123';
+  // Helper function to ensure URL has protocol
+  const ensureHttps = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    return `https://${url}`;
+  };
+
+  // Fetch all users
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch(`${API_URL}/users`);
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      alert('Failed to load users');
+    }
+  };
+
+  // Fetch user's wishlist
+  const fetchMyWishlist = async (userId) => {
+    try {
+      const response = await fetch(`${API_URL}/wishlist/${userId}`);
+      const data = await response.json();
+      setMyWishlist(data);
+    } catch (error) {
+      console.error('Error fetching wishlist:', error);
+      alert('Failed to load wishlist');
+    }
+  };
+
+  // Fetch other user's wishlist
+  const fetchOtherWishlist = async (userId) => {
+    try {
+      const response = await fetch(`${API_URL}/wishlist/${userId}`);
+      const data = await response.json();
+      setOtherWishlist(data);
+    } catch (error) {
+      console.error('Error fetching wishlist:', error);
+      alert('Failed to load wishlist');
+    }
+  };
+
+  // Load users on mount
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  // Load current user's wishlist when logged in
+  useEffect(() => {
+    if (isLoggedIn && currentUserId) {
+      fetchMyWishlist(currentUserId);
+    }
+  }, [isLoggedIn, currentUserId]);
+
+  // Verify password first
+  const [passwordVerified, setPasswordVerified] = useState(false);
+  const [verifiedAsAdmin, setVerifiedAsAdmin] = useState(false);
+
+  const verifyPassword = async () => {
+    if (!loginData.password) {
+      alert('Please enter a password');
+      return;
+    }
     
-    if (loginData.password === adminPassword) {
-      setIsAdmin(true);
-      setCurrentUser(loginData.selectedUser || 'Admin');
-      setIsLoggedIn(true);
-    } else if (loginData.password === userPassword && loginData.selectedUser) {
-      setIsAdmin(false);
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: loginData.password })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setPasswordVerified(true);
+        setVerifiedAsAdmin(data.isAdmin);
+        if (data.isAdmin) {
+          // Admin can log in immediately
+          setIsAdmin(true);
+          setCurrentUser('Admin');
+          setIsLoggedIn(true);
+        }
+      } else {
+        alert('Invalid password');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Login failed');
+    }
+    setLoading(false);
+  };
+
+  // Login handler (after password verified)
+  const handleLogin = async () => {
+    if (!loginData.selectedUser) {
+      alert('Please select your name');
+      return;
+    }
+    
+    // Find user ID from selected name
+    const user = users.find(u => u.name === loginData.selectedUser);
+    if (user) {
       setCurrentUser(loginData.selectedUser);
+      setCurrentUserId(user.id);
       setIsLoggedIn(true);
-    } else {
-      alert('Invalid password or user not selected');
     }
   };
 
@@ -59,63 +146,138 @@ const WishlistApp = () => {
     setFormData({ name: '', link: '', comments: '', userName: '' });
   };
 
-  const addWishlistItem = () => {
+  // Add wishlist item
+  const addWishlistItem = async () => {
     if (!formData.name) {
       alert('Item name is required');
       return;
     }
-    const newItem = {
-      id: Date.now().toString(),
-      name: formData.name,
-      link: formData.link,
-      comments: formData.comments,
-    };
-    setMyWishlist([...myWishlist, newItem]);
-    closeModal();
-  };
-
-  const deleteWishlistItem = (id) => {
-    setMyWishlist(myWishlist.filter(item => item.id !== id));
-    closeModal();
-  };
-
-  const togglePurchase = (id) => {
-    setOtherWishlist(otherWishlist.map(item => {
-      if (item.id === id) {
-        if (item.purchased && item.purchasedBy === currentUser) {
-          return { ...item, purchased: false, purchasedBy: null };
-        } else if (!item.purchased) {
-          return { ...item, purchased: true, purchasedBy: currentUser };
-        }
+    
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/wishlist/${currentUserId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itemName: formData.name,
+          hyperlink: formData.link,
+          comments: formData.comments
+        })
+      });
+      
+      if (response.ok) {
+        await fetchMyWishlist(currentUserId);
+        await fetchUsers(); // Update wishlist count
+        closeModal();
+      } else {
+        alert('Failed to add item');
       }
-      return item;
-    }));
+    } catch (error) {
+      console.error('Error adding item:', error);
+      alert('Failed to add item');
+    }
+    setLoading(false);
   };
 
-  const addUser = () => {
+  // Delete wishlist item
+  const deleteWishlistItem = async (itemId) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/wishlist/${itemId}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        await fetchMyWishlist(currentUserId);
+        await fetchUsers(); // Update wishlist count
+        closeModal();
+      } else {
+        alert('Failed to delete item');
+      }
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      alert('Failed to delete item');
+    }
+    setLoading(false);
+  };
+
+  // Toggle purchase
+  const togglePurchase = async (itemId) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/wishlist/${itemId}/purchase`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ purchasedBy: currentUser })
+      });
+      
+      if (response.ok) {
+        await fetchOtherWishlist(selectedUser.id);
+      } else {
+        alert('Failed to update purchase status');
+      }
+    } catch (error) {
+      console.error('Error updating purchase:', error);
+      alert('Failed to update purchase status');
+    }
+    setLoading(false);
+  };
+
+  // Add user
+  const addUser = async () => {
     if (!formData.userName) {
       alert('User name is required');
       return;
     }
-    const newUser = {
-      id: Date.now().toString(),
-      name: formData.userName,
-      wishlistCount: 0,
-    };
-    setUsers([...users, newUser]);
-    closeModal();
+    
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: formData.userName })
+      });
+      
+      if (response.ok) {
+        await fetchUsers();
+        closeModal();
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Failed to add user');
+      }
+    } catch (error) {
+      console.error('Error adding user:', error);
+      alert('Failed to add user');
+    }
+    setLoading(false);
   };
 
-  const deleteUser = (id) => {
-    setUsers(users.filter(user => user.id !== id));
-    closeModal();
+  // Delete user
+  const deleteUser = async (userId) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/users/${userId}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        await fetchUsers();
+        closeModal();
+      } else {
+        alert('Failed to delete user');
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert('Failed to delete user');
+    }
+    setLoading(false);
   };
 
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-green-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
-          <h1 className="text-3xl font-bold text-center mb-2 text-green-700">🎁 Gift Wishlist</h1>
+          <h1 className="text-3xl font-bold text-center mb-2 text-green-700">Christmas Wishlist 2025</h1>
           <p className="text-center text-gray-600 mb-6">Coordinate gifts with family & friends</p>
           
           <div className="space-y-4">
@@ -125,30 +287,49 @@ const WishlistApp = () => {
                 type="password"
                 value={loginData.password}
                 onChange={(e) => setLoginData({...loginData, password: e.target.value})}
+                onKeyPress={(e) => e.key === 'Enter' && !passwordVerified && verifyPassword()}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                disabled={loading || passwordVerified}
               />
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Select Your Name</label>
-              <select
-                value={loginData.selectedUser}
-                onChange={(e) => setLoginData({...loginData, selectedUser: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+            {!passwordVerified && (
+              <button
+                onClick={verifyPassword}
+                disabled={loading}
+                className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors font-medium disabled:bg-gray-400"
               >
-                <option value="">Choose your name...</option>
-                {users.map(user => (
-                  <option key={user.id} value={user.name}>{user.name}</option>
-                ))}
-              </select>
-            </div>
+                {loading ? 'Verifying...' : 'Continue'}
+              </button>
+            )}
             
-            <button
-              onClick={handleLogin}
-              className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors font-medium"
-            >
-              Log In
-            </button>
+            {passwordVerified && !verifiedAsAdmin && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Select Your Name</label>
+                  <select
+                    value={loginData.selectedUser}
+                    onChange={(e) => setLoginData({...loginData, selectedUser: e.target.value})}
+                    onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    disabled={loading}
+                  >
+                    <option value="">Choose your name...</option>
+                    {users.map(user => (
+                      <option key={user.id} value={user.name}>{user.name}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <button
+                  onClick={handleLogin}
+                  disabled={loading}
+                  className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors font-medium disabled:bg-gray-400"
+                >
+                  Log In
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -159,7 +340,7 @@ const WishlistApp = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-green-700 text-white p-4 shadow-md">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold">🎁 Gift Wishlist</h1>
+          <h1 className="text-2xl font-bold">Christmas Wishlist 2025</h1>
           <div className="flex items-center gap-4">
             <span className="text-sm">Welcome, {currentUser}!</span>
             {isAdmin && <span className="bg-red-600 px-2 py-1 rounded text-xs font-semibold">ADMIN</span>}
@@ -167,8 +348,12 @@ const WishlistApp = () => {
               onClick={() => {
                 setIsLoggedIn(false);
                 setCurrentUser(null);
+                setCurrentUserId(null);
                 setIsAdmin(false);
                 setActiveTab('myWishlist');
+                setPasswordVerified(false);
+                setVerifiedAsAdmin(false);
+                setLoginData({ password: '', selectedUser: '' });
               }}
               className="text-sm bg-white text-green-700 px-3 py-1 rounded hover:bg-gray-100 transition-colors"
             >
@@ -225,7 +410,8 @@ const WishlistApp = () => {
               <h2 className="text-2xl font-bold text-gray-800">Your Wishlist</h2>
               <button
                 onClick={() => openModal('addItem')}
-                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center gap-2"
+                disabled={loading}
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center gap-2 disabled:bg-gray-400"
               >
                 <Plus size={20} /> Add Item
               </button>
@@ -242,14 +428,14 @@ const WishlistApp = () => {
                 </thead>
                 <tbody>
                   {myWishlist.map(item => (
-                    <tr key={item.id} className="border-b hover:bg-gray-50">
+                    <tr key={item.itemId} className="border-b hover:bg-gray-50">
                       <td className="p-3">
-                        {item.link ? (
-                          <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                            {item.name}
+                        {item.hyperlink ? (
+                          <a href={ensureHttps(item.hyperlink)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                            {item.itemName}
                           </a>
                         ) : (
-                          <span>{item.name}</span>
+                          <span>{item.itemName}</span>
                         )}
                       </td>
                       <td className="p-3">
@@ -269,7 +455,8 @@ const WishlistApp = () => {
                       <td className="p-3 text-center">
                         <button
                           onClick={() => openModal('deleteItem', item)}
-                          className="text-red-600 hover:text-red-800 transition-colors"
+                          disabled={loading}
+                          className="text-red-600 hover:text-red-800 transition-colors disabled:text-gray-400"
                         >
                           <X size={20} />
                         </button>
@@ -300,7 +487,10 @@ const WishlistApp = () => {
                     <p className="text-sm text-gray-600">{user.wishlistCount} items on wishlist</p>
                   </div>
                   <button
-                    onClick={() => setSelectedUser(user)}
+                    onClick={() => {
+                      setSelectedUser(user);
+                      fetchOtherWishlist(user.id);
+                    }}
                     className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
                   >
                     View Their Wishlist
@@ -334,16 +524,16 @@ const WishlistApp = () => {
                 <tbody>
                   {otherWishlist.map(item => (
                     <tr 
-                      key={item.id} 
+                      key={item.itemId} 
                       className={`border-b ${item.purchased ? 'bg-red-50' : 'hover:bg-gray-50'}`}
                     >
                       <td className="p-3">
-                        {item.link ? (
-                          <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                            {item.name}
+                        {item.hyperlink ? (
+                          <a href={ensureHttps(item.hyperlink)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                            {item.itemName}
                           </a>
                         ) : (
-                          <span>{item.name}</span>
+                          <span>{item.itemName}</span>
                         )}
                       </td>
                       <td className="p-3">
@@ -363,16 +553,18 @@ const WishlistApp = () => {
                       <td className="p-3 text-center">
                         {!item.purchased && (
                           <button
-                            onClick={() => togglePurchase(item.id)}
-                            className="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700 transition-colors text-sm"
+                            onClick={() => togglePurchase(item.itemId)}
+                            disabled={loading}
+                            className="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700 transition-colors text-sm disabled:bg-gray-400"
                           >
-                            Purchase
+                            Mark as Purchased
                           </button>
                         )}
                         {item.purchased && item.purchasedBy === currentUser && (
                           <button
-                            onClick={() => togglePurchase(item.id)}
-                            className="bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700 transition-colors text-sm"
+                            onClick={() => togglePurchase(item.itemId)}
+                            disabled={loading}
+                            className="bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700 transition-colors text-sm disabled:bg-gray-400"
                           >
                             Cancel Purchase
                           </button>
@@ -383,6 +575,13 @@ const WishlistApp = () => {
                       </td>
                     </tr>
                   ))}
+                  {otherWishlist.length === 0 && (
+                    <tr>
+                      <td colSpan="3" className="p-8 text-center text-gray-500">
+                        No items on this wishlist yet.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -395,7 +594,8 @@ const WishlistApp = () => {
               <h2 className="text-2xl font-bold text-gray-800">Manage Your Group</h2>
               <button
                 onClick={() => openModal('addUser')}
-                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center gap-2"
+                disabled={loading}
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center gap-2 disabled:bg-gray-400"
               >
                 <Plus size={20} /> Add User
               </button>
@@ -418,7 +618,8 @@ const WishlistApp = () => {
                       <td className="p-3 text-center">
                         <button
                           onClick={() => openModal('deleteUser', user)}
-                          className="text-red-600 hover:text-red-800 transition-colors"
+                          disabled={loading}
+                          className="text-red-600 hover:text-red-800 transition-colors disabled:text-gray-400"
                         >
                           <X size={20} />
                         </button>
@@ -446,6 +647,7 @@ const WishlistApp = () => {
                       value={formData.name}
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      disabled={loading}
                     />
                   </div>
                   <div>
@@ -455,6 +657,7 @@ const WishlistApp = () => {
                       value={formData.link}
                       onChange={(e) => setFormData({...formData, link: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      disabled={loading}
                     />
                   </div>
                   <div>
@@ -464,19 +667,22 @@ const WishlistApp = () => {
                       onChange={(e) => setFormData({...formData, comments: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                       rows="3"
+                      disabled={loading}
                     />
                   </div>
                 </div>
                 <div className="flex gap-3 mt-6">
                   <button
                     onClick={addWishlistItem}
-                    className="flex-1 bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors"
+                    disabled={loading}
+                    className="flex-1 bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors disabled:bg-gray-400"
                   >
-                    Submit
+                    {loading ? 'Adding...' : 'Submit'}
                   </button>
                   <button
                     onClick={closeModal}
-                    className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-md hover:bg-gray-400 transition-colors"
+                    disabled={loading}
+                    className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-md hover:bg-gray-400 transition-colors disabled:bg-gray-200"
                   >
                     Cancel
                   </button>
@@ -490,14 +696,16 @@ const WishlistApp = () => {
                 <p className="text-gray-700 mb-6">Are you sure you want to remove this item from your wishlist?</p>
                 <div className="flex gap-3">
                   <button
-                    onClick={() => deleteWishlistItem(selectedUser.id)}
-                    className="flex-1 bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition-colors"
+                    onClick={() => deleteWishlistItem(selectedUser.itemId)}
+                    disabled={loading}
+                    className="flex-1 bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition-colors disabled:bg-gray-400"
                   >
-                    Yes
+                    {loading ? 'Deleting...' : 'Yes'}
                   </button>
                   <button
                     onClick={closeModal}
-                    className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-md hover:bg-gray-400 transition-colors"
+                    disabled={loading}
+                    className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-md hover:bg-gray-400 transition-colors disabled:bg-gray-200"
                   >
                     No
                   </button>
@@ -528,18 +736,21 @@ const WishlistApp = () => {
                     value={formData.userName}
                     onChange={(e) => setFormData({...formData, userName: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    disabled={loading}
                   />
                 </div>
                 <div className="flex gap-3">
                   <button
                     onClick={addUser}
-                    className="flex-1 bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors"
+                    disabled={loading}
+                    className="flex-1 bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors disabled:bg-gray-400"
                   >
-                    Submit
+                    {loading ? 'Adding...' : 'Submit'}
                   </button>
                   <button
                     onClick={closeModal}
-                    className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-md hover:bg-gray-400 transition-colors"
+                    disabled={loading}
+                    className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-md hover:bg-gray-400 transition-colors disabled:bg-gray-200"
                   >
                     Cancel
                   </button>
@@ -554,13 +765,15 @@ const WishlistApp = () => {
                 <div className="flex gap-3">
                   <button
                     onClick={() => deleteUser(selectedUser.id)}
-                    className="flex-1 bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition-colors"
+                    disabled={loading}
+                    className="flex-1 bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition-colors disabled:bg-gray-400"
                   >
-                    Yes
+                    {loading ? 'Deleting...' : 'Yes'}
                   </button>
                   <button
                     onClick={closeModal}
-                    className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-md hover:bg-gray-400 transition-colors"
+                    disabled={loading}
+                    className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-md hover:bg-gray-400 transition-colors disabled:bg-gray-200"
                   >
                     No
                   </button>
