@@ -1,0 +1,187 @@
+@import "tailwindcss";
+
+/* Force light color scheme to prevent dark mode interference */
+* {
+  color-scheme: light only;
+}
+
+/* Reset and base styles */
+body, html, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f9fafb;
+}
+
+/* Ensure full width */
+.min-h-screen {
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Override any browser dark mode styles */
+input, select, textarea, button {
+  color-scheme: light;
+  background-color: white;
+  color: black;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #16a34a;
+  kerning: 2px solid #16a34a;
+}
+
+/* Specific overrides for form elements */
+input[type="text"],
+input[type="password"],
+input[type="url"],
+select,
+textarea {
+  background-color: white !important;
+  color: #1f2937 !important;
+  border: 1px solid #d1d5db;
+}
+
+/* Button color fixes */
+button {
+  background-color: inherit;
+  color: inherit;
+  border: none;
+  cursor: pointer;
+}
+
+/* Table styles to prevent dark mode issues */
+table {
+  background-color: white !important;
+  color: #1f2937 !important;
+}
+
+thead {
+  background-color: #f3f4f6 !important;
+  color: #374151 !important;
+}
+
+tbody tr {
+  background-color: white !important;
+  color: #1f2937 !important;
+}
+
+tbody tr:hover {
+  background-color: #f9fafb !important;
+}
+
+/* Link styles */
+a {
+  color: #2563eb !important;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Modal backdrop - semi-transparent dark overlay */
+.fixed.inset-0 {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.bg-black.bg-opacity-50 {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Ensure modal content is visible */
+.fixed .bg-white {
+  background-color: white !important;
+  color: #1f2937 !important;
+  z-index: 60;
+}
+
+/* Ensure proper text colors throughout */
+.text-gray-700 {
+  color: #374151 !important;
+}
+
+.text-gray-600 {
+  color: #4b5563 !important;
+}
+
+.text-gray-800 {
+  color: #1f2937 !important;
+}
+
+.text-white {
+  color: white !important;
+}
+
+/* Green color overrides */
+.bg-green-600 {
+  background-color: #16a34a !important;
+}
+
+.bg-green-700 {
+  background-color: #15803d !important;
+}
+
+.text-green-600 {
+  color: #16a34a !important;
+}
+
+.text-green-700 {
+  color: #15803d !important;
+}
+
+/* Red color overrides */
+.bg-red-600 {
+  background-color: #dc2626 !important;
+}
+
+.bg-red-50 {
+  background-color: #fef2f2 !important;
+}
+
+.text-red-600 {
+  color: #dc2626 !important;
+}
+
+/* Ensure white backgrounds stay white */
+.bg-white {
+  background-color: white !important;
+}
+
+/* Gray backgrounds */
+.bg-gray-50 {
+  background-color: #f9fafb !important;
+}
+
+.bg-gray-100 {
+  background-color: #f3f4f6 !important;
+}
+
+.bg-gray-300 {
+  background-color: #d1d5db !important;
+}
+
+/* Gradient background for login */
+.bg-gradient-to-br {
+  background-image: linear-gradient(to bottom right, #fef2f2, #f0fdf4) !important;
+}
+
+/* Purchased row highlight */
+tr.bg-red-50 {
+  background-color: #fef2f2 !important;
+}
+
+tr.bg-red-50 td {
+  color: #1f2937 !important;
+}
