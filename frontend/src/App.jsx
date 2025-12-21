@@ -61,15 +61,17 @@ const WishlistApp = () => {
     loading: wishlistLoading,
     addWishlistItem,
     deleteWishlistItem,
+    updateWishlistItem,
     togglePurchase,
     fetchOtherWishlist,
   } = useWishlist({ currentUserId, currentUser, refreshUsers: fetchUsers });
 
   /* ───────────── Modal Handlers ───────────── */
   const combinedLoading = authLoading || wishlistLoading || userLoading;
-  
+
   const handleAddItem = () => openModal('addItem', { onSubmit: addWishlistItem, loading: combinedLoading });
   const handleDeleteItem = (item) => openModal('deleteItem', { item, onConfirm: deleteWishlistItem, loading: combinedLoading });
+  const handleEditItem = (item) => openModal('editItem', { item, onSubmit: (data) => updateWishlistItem(item.itemId, data), loading: combinedLoading });
   const handleAddUser = () => openModal('addUser', { onSubmit: addUser, loading: combinedLoading });
   const handleDeleteUser = (user) => openModal('deleteUser', { user, onConfirm: deleteUser, loading: combinedLoading });
   const handleViewComments = (comments) => openModal('viewComments', { comments });
@@ -111,6 +113,7 @@ const WishlistApp = () => {
               items={myWishlist}
               loading={combinedLoading}
               onAdd={handleAddItem}
+              onEdit={handleEditItem}
               onDelete={handleDeleteItem}
               onViewComments={handleViewComments}
             />

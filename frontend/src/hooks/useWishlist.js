@@ -58,11 +58,11 @@ export const useWishlist = ({ currentUserId, currentUser, refreshUsers }) => {
             });
 
             if (!res.ok) return alert('Failed to add item');
-            
+
             const updatedRes = await fetch(`${API_URL}/wishlist/${currentUserId}`);
             const data = await updatedRes.json();
             setMyWishlist(data);
-            
+
             // Refresh user counts
             if (refreshUsers) await refreshUsers();
         } catch (err) {
@@ -102,6 +102,35 @@ export const useWishlist = ({ currentUserId, currentUser, refreshUsers }) => {
         }
     };
 
+    // Update an item in current user's wishlist
+    const updateWishlistItem = async (itemId, { name, link, comments }) => {
+        if (!name) return alert('Item name is required');
+        if (!itemId) return;
+
+        setLoading(true);
+        try {
+            const res = await fetch(`${API_URL}/wishlist/${itemId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ itemName: name, hyperlink: link, comments }),
+            });
+
+            if (!res.ok) return alert('Failed to update item');
+
+            // Refresh wishlist
+            if (currentUserId) {
+                const updatedRes = await fetch(`${API_URL}/wishlist/${currentUserId}`);
+                const data = await updatedRes.json();
+                setMyWishlist(data);
+            }
+        } catch (err) {
+            console.error('Error updating item:', err);
+            alert('Failed to update item');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // Toggle purchase status on another user's wishlist
     const togglePurchase = async (itemId, selectedUserId) => {
         if (!itemId || !selectedUserId) return;
@@ -133,6 +162,7 @@ export const useWishlist = ({ currentUserId, currentUser, refreshUsers }) => {
         fetchOtherWishlist,
         addWishlistItem,
         deleteWishlistItem,
+        updateWishlistItem,
         togglePurchase,
     };
 };

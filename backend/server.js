@@ -251,6 +251,29 @@ app.delete('/api/wishlist/:itemId', async (req, res) => {
   }
 });
 
+// Update wishlist item
+app.put('/api/wishlist/:itemId', async (req, res) => {
+  try {
+    const { itemName, hyperlink, comments } = req.body;
+    const item = await WishlistItem.findOne({ itemId: req.params.itemId });
+    
+    if (!item) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+    
+    // Update the item fields
+    if (itemName !== undefined) item.itemName = itemName;
+    if (hyperlink !== undefined) item.hyperlink = hyperlink;
+    if (comments !== undefined) item.comments = comments;
+    
+    await item.save();
+    
+    res.json(item);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Toggle purchase status
 app.patch('/api/wishlist/:itemId/purchase', async (req, res) => {
   try {

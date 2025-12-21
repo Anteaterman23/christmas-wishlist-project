@@ -2,6 +2,7 @@ import React from 'react';
 import Modal from './Modal';
 
 import AddItemModal from './AddItemModal';
+import EditItemModal from './EditItemModal';
 import DeleteItemModal from './DeleteItemModal';
 import AddUserModal from './AddUserModal';
 import ViewCommentsModal from './ViewCommentsModal';
@@ -19,6 +20,14 @@ const ModalRoot = ({
             case 'addItem':
                 return (
                     <AddItemModal
+                        {...modalProps}
+                        onClose={closeModal}
+                    />
+                );
+
+            case 'editItem':
+                return (
+                    <EditItemModal
                         {...modalProps}
                         onClose={closeModal}
                     />

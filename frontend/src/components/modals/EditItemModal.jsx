@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 
-const AddItemModal = ({ onClose, onSubmit, loading }) => {
-    const [itemName, setItemName] = useState('');
-    const [hyperlink, setHyperlink] = useState('');
-    const [comments, setComments] = useState('');
+const EditItemModal = ({ item, onClose, onSubmit, loading }) => {
+    const [itemName, setItemName] = useState(item.itemName || '');
+    const [hyperlink, setHyperlink] = useState(item.hyperlink || '');
+    const [comments, setComments] = useState(item.comments || '');
 
     const handleSubmit = () => {
         if (!itemName.trim()) {
@@ -12,7 +12,7 @@ const AddItemModal = ({ onClose, onSubmit, loading }) => {
         }
 
         onSubmit({
-            name: itemName, 
+            name: itemName,
             link: hyperlink,
             comments: comments
         });
@@ -22,7 +22,7 @@ const AddItemModal = ({ onClose, onSubmit, loading }) => {
 
     return (
         <div>
-            <h2 className="text-xl font-bold mb-4">Add Wishlist Item</h2>
+            <h2 className="text-xl font-bold mb-4">Edit Wishlist Item</h2>
 
             <div className="space-y-3">
                 <input
@@ -63,11 +63,11 @@ const AddItemModal = ({ onClose, onSubmit, loading }) => {
                     disabled={loading}
                     className="px-4 py-2 rounded bg-green-600 text-white disabled:bg-gray-400"
                 >
-                    Add Item
+                    Save Changes
                 </button>
             </div>
         </div>
     );
 };
 
-export default AddItemModal;
+export default EditItemModal;

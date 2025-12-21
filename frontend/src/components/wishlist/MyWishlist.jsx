@@ -1,7 +1,7 @@
-import { X, Plus } from 'lucide-react';
+import { X, Plus, Pencil } from 'lucide-react';
 import { ensureHttps } from '../../utils/ensureHttps';
 
-const MyWishlist = ({ items, onAdd, onDelete, onViewComments, loading }) => (
+const MyWishlist = ({ items, onAdd, onEdit, onDelete, onViewComments, loading }) => (
     <div className="max-w-6xl mx-auto p-6">
         <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-gray-800">Your Wishlist</h2>
@@ -28,9 +28,9 @@ const MyWishlist = ({ items, onAdd, onDelete, onViewComments, loading }) => (
                         <tr key={item.itemId} className="border-b hover:bg-gray-50">
                             <td className="p-3">
                                 {item.hyperlink ? (
-                                    <a
-                                        href={ensureHttps(item.hyperlink)}
-                                        target="_blank"
+                                    <a 
+                                        href={ensureHttps(item.hyperlink)} 
+                                        target="_blank" 
                                         rel="noopener noreferrer"
                                         className="text-blue-600 hover:underline"
                                     >
@@ -51,13 +51,24 @@ const MyWishlist = ({ items, onAdd, onDelete, onViewComments, loading }) => (
                                 )}
                             </td>
                             <td className="p-3 text-center">
-                                <button
-                                    onClick={() => onDelete(item)}
-                                    disabled={loading}
-                                    className="text-red-600 hover:text-red-800 transition-colors disabled:text-gray-400"
-                                >
-                                    <X size={20} />
-                                </button>
+                                <div className="flex items-center justify-center gap-2">
+                                    <button
+                                        onClick={() => onEdit(item)}
+                                        disabled={loading}
+                                        className="text-blue-600 hover:text-blue-800 transition-colors disabled:text-gray-400"
+                                        title="Edit item"
+                                    >
+                                        <Pencil size={20} />
+                                    </button>
+                                    <button
+                                        onClick={() => onDelete(item)}
+                                        disabled={loading}
+                                        className="text-red-600 hover:text-red-800 transition-colors disabled:text-gray-400"
+                                        title="Delete item"
+                                    >
+                                        <X size={20} />
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     ))}
