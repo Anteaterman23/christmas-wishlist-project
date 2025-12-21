@@ -1,4 +1,5 @@
 import React from 'react';
+import { displayWishlistCount } from '../../utils/displayWishlistCount';
 
 const BuyForOthers = ({
     users,
@@ -6,7 +7,7 @@ const BuyForOthers = ({
     onSelectUser
 }) => {
     return (
-        <div>
+        <div className="max-w-6xl mx-auto p-6">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
                 Buy Gifts for Others
             </h2>
@@ -24,7 +25,7 @@ const BuyForOthers = ({
                                     {user.name}
                                 </h3>
                                 <p className="text-sm text-gray-600">
-                                    {user.wishlistCount} items on wishlist
+                                    {displayWishlistCount(user.wishlistCount)}
                                 </p>
                             </div>
 

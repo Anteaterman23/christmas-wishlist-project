@@ -12,7 +12,7 @@ const OtherWishlist = ({
     onViewComments
 }) => {
     return (
-        <div>
+        <div className="max-w-6xl mx-auto p-6">
             <button
                 onClick={onBack}
                 className="mb-4 text-green-600 hover:text-green-700 flex items-center gap-2 font-medium"
