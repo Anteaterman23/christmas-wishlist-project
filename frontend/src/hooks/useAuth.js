@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { tabs } from '../utils/consts';
+import { guestName, tabs } from '../utils/consts';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -30,10 +30,7 @@ export const useAuth = ({ setActiveTab }) => {
             if (data.isAdmin) {
                 setIsAdmin(true);
                 setCurrentUser('Admin');
-                setActiveTab(tabs.manageGroup.keyString);
                 setIsLoggedIn(true);
-            } else {
-                setActiveTab(tabs.myWishlist.keyString);
             }
         } catch (err) {
             console.error(err);
@@ -47,6 +44,14 @@ export const useAuth = ({ setActiveTab }) => {
         if (!loginData.selectedUser) return alert('Please select your name');
         const user = users.find(u => u.name === loginData.selectedUser);
         if (!user) return alert('User not found');
+
+        if (isAdmin) {
+            setActiveTab(tabs.manageGroup.keyString);
+        } else if (user.name === guestName) {
+            setActiveTab(tabs.buyForOthers.keyString);
+        } else {
+            setActiveTab(tabs.myWishlist.keyString);
+        }
 
         setCurrentUser(user.name);
         setCurrentUserId(user.id);

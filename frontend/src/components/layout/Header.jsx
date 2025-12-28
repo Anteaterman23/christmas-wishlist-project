@@ -1,7 +1,9 @@
+import { getYear } from '../../utils/getYear';
+
 const Header = ({ currentUser, isAdmin, onLogout }) => (
     <div className="bg-green-700 text-white p-4 shadow-md">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
-            <h1 className="text-2xl font-bold">Christmas Wishlist 2025</h1>
+            <h1 className="text-2xl font-bold">Christmas Wishlist {getYear()}</h1>
             <div className="flex items-center gap-4">
                 <span>Welcome, {currentUser}!</span>
                 {isAdmin && (

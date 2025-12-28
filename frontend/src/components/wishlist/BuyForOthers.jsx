@@ -1,5 +1,6 @@
 import React from 'react';
 import { displayWishlistCount } from '../../utils/displayWishlistCount';
+import { guestName } from '../../utils/consts';
 
 const BuyForOthers = ({
     users,
@@ -14,7 +15,7 @@ const BuyForOthers = ({
 
             <div className="grid gap-3">
                 {users
-                    .filter(user => user.name !== currentUser)
+                    .filter(user => user.name !== currentUser && user.name !== guestName)
                     .map(user => (
                         <div
                             key={user.id}

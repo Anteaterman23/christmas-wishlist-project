@@ -1,8 +1,12 @@
-import { tabs } from "./consts";
+import { tabs, guestName } from "./consts";
 
 export const shouldIncludeTab = (tab, isAdmin) => {
     return tab.isAdmin === isAdmin;
 };
+
+export const shouldDisplayTabs = (currentUser) => {
+    return currentUser !== guestName;
+}
 
 export const isMyWishlistTab = (tab) => {
     return tab === tabs.myWishlist.keyString;

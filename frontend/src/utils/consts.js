@@ -1,3 +1,5 @@
+export const guestName = "GUEST";
+
 export const tabs = {
     myWishlist: {
         keyString: "myWishlist",

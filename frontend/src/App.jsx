@@ -22,7 +22,8 @@ import {
   isManageGroupTab,
   isMyWishlistTab,
   isOtherWishlistTab,
-  isUpdatePassword
+  isUpdatePassword,
+  shouldDisplayTabs
 } from './utils/tabConditionals';
 
 const WishlistApp = () => {
@@ -113,11 +114,13 @@ const WishlistApp = () => {
             }}
           />
 
-          <Tabs
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            isAdmin={isAdmin}
-          />
+          {shouldDisplayTabs(currentUser) && (
+            <Tabs
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              isAdmin={isAdmin}
+            />
+          )}
 
           {isMyWishlistTab(activeTab) && (
             <MyWishlist
