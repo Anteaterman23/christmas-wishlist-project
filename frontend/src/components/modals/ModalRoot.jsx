@@ -9,6 +9,7 @@ import DeleteItemModal from './DeleteItemModal';
 import AddUserModal from './AddUserModal';
 import DeleteUserModal from './DeleteUserModal';
 import ViewCommentsModal from './ViewCommentsModal';
+import MessageModal from './MessageModal';
 
 const ModalRoot = ({
     isOpen,
@@ -63,6 +64,14 @@ const ModalRoot = ({
             case modals.viewComments:
                 return (
                     <ViewCommentsModal
+                        {...modalProps}
+                        onClose={closeModal}
+                    />
+                );
+
+            case modals.messageModal:
+                return (
+                    <MessageModal
                         {...modalProps}
                         onClose={closeModal}
                     />

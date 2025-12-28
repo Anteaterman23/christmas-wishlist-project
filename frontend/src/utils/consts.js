@@ -27,5 +27,6 @@ export const modals = {
     deleteItem: "deleteItem",
     addUser: "addUser",
     deleteUser: "deleteUser",
-    viewComments: "viewComments"
+    viewComments: "viewComments",
+    messageModal: "messageModal"
 };

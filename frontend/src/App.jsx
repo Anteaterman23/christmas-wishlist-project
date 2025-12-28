@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './App.css'; 
+import './App.css';
 
 import { useModal } from './hooks/useModal';
 import { useAuth } from './hooks/useAuth';
@@ -10,9 +10,10 @@ import LoginScreen from './components/auth/LoginScreen';
 import Header from './components/layout/Header';
 import Tabs from './components/layout/Tabs';
 import MyWishlist from './components/wishlist/MyWishlist';
-import ManageGroup from './components/admin/ManageGroup';
 import BuyForOthers from './components/wishlist/BuyForOthers';
 import OtherWishlist from './components/wishlist/OtherWishlist';
+import ManageGroup from './components/admin/ManageGroup';
+import UpdatePasswords from './components/admin/UpdatePasswords';
 import ModalRoot from './components/modals/ModalRoot';
 
 import { modals } from './utils/consts';
@@ -20,7 +21,8 @@ import {
   isBuyForOthersTab,
   isManageGroupTab,
   isMyWishlistTab,
-  isOtherWishlistTab
+  isOtherWishlistTab,
+  isUpdatePassword
 } from './utils/tabConditionals';
 
 const WishlistApp = () => {
@@ -83,6 +85,7 @@ const WishlistApp = () => {
   const handleAddUser = () => openModal(modals.addUser, { onSubmit: addUser, loading: combinedLoading });
   const handleDeleteUser = (user) => openModal(modals.deleteUser, { user, onConfirm: deleteUser, loading: combinedLoading });
   const handleViewComments = (comments) => openModal(modals.viewComments, { comments });
+  const handleShowMessage = (title, message) => openModal(modals.messageModal, { title, message });
 
   /* ───────────── Render ───────────── */
   return (
@@ -146,7 +149,7 @@ const WishlistApp = () => {
               loading={combinedLoading}
               onBack={() => setSelectedUser(null)}
               onTogglePurchase={(itemId) => togglePurchase(itemId, selectedUser.id)}
-              onViewComments={(comments) => openModal('viewComments', { comments })}
+              onViewComments={handleViewComments}
             />
           )}
 
@@ -156,6 +159,12 @@ const WishlistApp = () => {
               loading={combinedLoading}
               onAddUser={handleAddUser}
               onDeleteUser={handleDeleteUser}
+            />
+          )}
+
+          {isUpdatePassword(activeTab) && (
+            <UpdatePasswords
+              onShowMessage={handleShowMessage}
             />
           )}
         </>
