@@ -30,6 +30,7 @@ export const useAuth = ({ setActiveTab }) => {
             if (data.isAdmin) {
                 setIsAdmin(true);
                 setCurrentUser('Admin');
+                setActiveTab(tabs.manageGroup.keyString);
                 setIsLoggedIn(true);
             }
         } catch (err) {
@@ -45,9 +46,7 @@ export const useAuth = ({ setActiveTab }) => {
         const user = users.find(u => u.name === loginData.selectedUser);
         if (!user) return alert('User not found');
 
-        if (isAdmin) {
-            setActiveTab(tabs.manageGroup.keyString);
-        } else if (user.name === guestName) {
+        if (user.name === guestName) {
             setActiveTab(tabs.buyForOthers.keyString);
         } else {
             setActiveTab(tabs.myWishlist.keyString);
