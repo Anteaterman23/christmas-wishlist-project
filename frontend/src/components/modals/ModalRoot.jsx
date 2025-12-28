@@ -1,10 +1,13 @@
 import React from 'react';
 import Modal from './Modal';
 
+import { modals } from '../../utils/consts';
+
 import AddItemModal from './AddItemModal';
 import EditItemModal from './EditItemModal';
 import DeleteItemModal from './DeleteItemModal';
 import AddUserModal from './AddUserModal';
+import DeleteUserModal from './DeleteUserModal';
 import ViewCommentsModal from './ViewCommentsModal';
 
 const ModalRoot = ({
@@ -17,7 +20,7 @@ const ModalRoot = ({
 
     const renderModal = () => {
         switch (modalType) {
-            case 'addItem':
+            case modals.addItem:
                 return (
                     <AddItemModal
                         {...modalProps}
@@ -25,7 +28,7 @@ const ModalRoot = ({
                     />
                 );
 
-            case 'editItem':
+            case modals.editItem:
                 return (
                     <EditItemModal
                         {...modalProps}
@@ -33,7 +36,7 @@ const ModalRoot = ({
                     />
                 );
 
-            case 'deleteItem':
+            case modals.deleteItem:
                 return (
                     <DeleteItemModal
                         {...modalProps}
@@ -41,7 +44,7 @@ const ModalRoot = ({
                     />
                 );
 
-            case 'addUser':
+            case modals.addUser:
                 return (
                     <AddUserModal
                         {...modalProps}
@@ -49,7 +52,15 @@ const ModalRoot = ({
                     />
                 );
 
-            case 'viewComments':
+            case modals.deleteUser:
+                return (
+                    <DeleteUserModal
+                        {...modalProps}
+                        onClose={closeModal}
+                    />
+                );
+
+            case modals.viewComments:
                 return (
                     <ViewCommentsModal
                         {...modalProps}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './App.css';
+import './App.css'; 
 
 import { useModal } from './hooks/useModal';
 import { useAuth } from './hooks/useAuth';
@@ -15,9 +15,17 @@ import BuyForOthers from './components/wishlist/BuyForOthers';
 import OtherWishlist from './components/wishlist/OtherWishlist';
 import ModalRoot from './components/modals/ModalRoot';
 
+import { modals } from './utils/consts';
+import {
+  isBuyForOthersTab,
+  isManageGroupTab,
+  isMyWishlistTab,
+  isOtherWishlistTab
+} from './utils/tabConditionals';
+
 const WishlistApp = () => {
   /* ─────────────── Core App State ─────────────── */
-  const [activeTab, setActiveTab] = useState('myWishlist');
+  const [activeTab, setActiveTab] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
 
   /* ─────────────── Modal System ─────────────── */
@@ -52,7 +60,7 @@ const WishlistApp = () => {
     verifyPassword,
     handleLogin,
     logout,
-  } = useAuth();
+  } = useAuth({ setActiveTab });
 
   /* ───────────── Wishlist ───────────── */
   const {
@@ -69,12 +77,12 @@ const WishlistApp = () => {
   /* ───────────── Modal Handlers ───────────── */
   const combinedLoading = authLoading || wishlistLoading || userLoading;
 
-  const handleAddItem = () => openModal('addItem', { onSubmit: addWishlistItem, loading: combinedLoading });
-  const handleDeleteItem = (item) => openModal('deleteItem', { item, onConfirm: deleteWishlistItem, loading: combinedLoading });
-  const handleEditItem = (item) => openModal('editItem', { item, onSubmit: (data) => updateWishlistItem(item.itemId, data), loading: combinedLoading });
-  const handleAddUser = () => openModal('addUser', { onSubmit: addUser, loading: combinedLoading });
-  const handleDeleteUser = (user) => openModal('deleteUser', { user, onConfirm: deleteUser, loading: combinedLoading });
-  const handleViewComments = (comments) => openModal('viewComments', { comments });
+  const handleAddItem = () => openModal(modals.addItem, { onSubmit: addWishlistItem, loading: combinedLoading });
+  const handleDeleteItem = (item) => openModal(modals.deleteItem, { item, onConfirm: deleteWishlistItem, loading: combinedLoading });
+  const handleEditItem = (item) => openModal(modals.editItem, { item, onSubmit: (data) => updateWishlistItem(item.itemId, data), loading: combinedLoading });
+  const handleAddUser = () => openModal(modals.addUser, { onSubmit: addUser, loading: combinedLoading });
+  const handleDeleteUser = (user) => openModal(modals.deleteUser, { user, onConfirm: deleteUser, loading: combinedLoading });
+  const handleViewComments = (comments) => openModal(modals.viewComments, { comments });
 
   /* ───────────── Render ───────────── */
   return (
@@ -97,7 +105,7 @@ const WishlistApp = () => {
             isAdmin={isAdmin}
             onLogout={() => {
               setSelectedUser(null);
-              setActiveTab('myWishlist');
+              setActiveTab(null);
               logout();
             }}
           />
@@ -108,7 +116,7 @@ const WishlistApp = () => {
             isAdmin={isAdmin}
           />
 
-          {activeTab === 'myWishlist' && (
+          {isMyWishlistTab(activeTab) && (
             <MyWishlist
               items={myWishlist}
               loading={combinedLoading}
@@ -119,7 +127,7 @@ const WishlistApp = () => {
             />
           )}
 
-          {activeTab === 'buyForOthers' && !selectedUser && (
+          {isBuyForOthersTab(activeTab, selectedUser) && (
             <BuyForOthers
               users={users}
               currentUser={currentUser}
@@ -130,7 +138,7 @@ const WishlistApp = () => {
             />
           )}
 
-          {activeTab === 'buyForOthers' && selectedUser && (
+          {isOtherWishlistTab(activeTab, selectedUser) && (
             <OtherWishlist
               user={selectedUser}
               wishlist={otherWishlist}
@@ -142,7 +150,7 @@ const WishlistApp = () => {
             />
           )}
 
-          {activeTab === 'manageGroup' && (
+          {isManageGroupTab(activeTab) && (
             <ManageGroup
               users={users}
               loading={combinedLoading}

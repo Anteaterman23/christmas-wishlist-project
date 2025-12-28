@@ -1,8 +1,9 @@
 import { useState } from 'react';
+import { tabs } from '../utils/consts';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export const useAuth = () => {
+export const useAuth = ({ setActiveTab }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
     const [currentUserId, setCurrentUserId] = useState(null);
@@ -29,7 +30,10 @@ export const useAuth = () => {
             if (data.isAdmin) {
                 setIsAdmin(true);
                 setCurrentUser('Admin');
+                setActiveTab(tabs.manageGroup.keyString);
                 setIsLoggedIn(true);
+            } else {
+                setActiveTab(tabs.myWishlist.keyString);
             }
         } catch (err) {
             console.error(err);

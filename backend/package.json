@@ -1,6 +1,7 @@
 {
   "name": "wishlist-backend",
   "version": "1.0.0",
+  "type": "module",
   "description": "Backend API for Gift Wishlist Coordinator",
   "main": "server.js",
   "scripts": {
