@@ -1,11 +1,12 @@
 import React from 'react';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, Trash2 } from 'lucide-react';
 
 const ManageGroup = ({
     users,
     loading,
     onAddUser,
-    onDeleteUser
+    onDeleteUser,
+    onClearAllWishlists
 }) => {
     return (
         <div className="max-w-6xl mx-auto p-6">
@@ -79,6 +80,17 @@ const ManageGroup = ({
                         )}
                     </tbody>
                 </table>
+            </div>
+
+            <div className="mt-6 flex justify-center">
+                <button
+                    onClick={onClearAllWishlists}
+                    disabled={loading}
+                    className="bg-red-600 text-white px-6 py-3 rounded-md hover:bg-red-700 transition-colors flex items-center gap-2 disabled:bg-gray-400 font-medium"
+                >
+                    <Trash2 size={20} />
+                    Clear All Wishlists
+                </button>
             </div>
         </div>
     );

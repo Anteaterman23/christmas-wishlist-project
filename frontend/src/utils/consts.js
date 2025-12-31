@@ -2,22 +2,22 @@ export const guestName = "GUEST";
 
 export const tabs = {
     myWishlist: {
-        keyString: "myWishlist",
+        key: "myWishlist",
         name: "Add To Your Wishlist",
         isAdmin: false
     },
     buyForOthers: {
-        keyString: "buyForOthers",
+        key: "buyForOthers",
         name: "Buy For Others",
         isAdmin: false
     },
     manageGroup: {
-        keyString: "manageGroup",
+        key: "manageGroup",
         name: "Manage Your Group",
         isAdmin: true
     },
     updatePassword: {
-        keyString: "updatePassword",
+        key: "updatePassword",
         name: "Update Passwords",
         isAdmin: true
     }
@@ -29,6 +29,7 @@ export const modals = {
     deleteItem: "deleteItem",
     addUser: "addUser",
     deleteUser: "deleteUser",
+    clearWishlists: "clearWishlists",
     viewComments: "viewComments",
     messageModal: "messageModal"
 };

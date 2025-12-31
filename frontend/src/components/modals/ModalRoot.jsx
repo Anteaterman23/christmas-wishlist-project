@@ -8,6 +8,7 @@ import EditItemModal from './EditItemModal';
 import DeleteItemModal from './DeleteItemModal';
 import AddUserModal from './AddUserModal';
 import DeleteUserModal from './DeleteUserModal';
+import ClearWishlistsModal from './ClearWishlistsModal';
 import ViewCommentsModal from './ViewCommentsModal';
 import MessageModal from './MessageModal';
 
@@ -56,6 +57,14 @@ const ModalRoot = ({
             case modals.deleteUser:
                 return (
                     <DeleteUserModal
+                        {...modalProps}
+                        onClose={closeModal}
+                    />
+                );
+
+            case modals.clearWishlists:
+                return (
+                    <ClearWishlistsModal
                         {...modalProps}
                         onClose={closeModal}
                     />

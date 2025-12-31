@@ -17,6 +17,7 @@ import UpdatePasswords from './components/admin/UpdatePasswords';
 import ModalRoot from './components/modals/ModalRoot';
 
 import { modals } from './utils/consts';
+import { clearAllWishlists } from './utils/clearAllWishlists';
 import {
   isBuyForOthersTab,
   isManageGroupTab,
@@ -87,6 +88,22 @@ const WishlistApp = () => {
   const handleDeleteUser = (user) => openModal(modals.deleteUser, { user, onConfirm: deleteUser, loading: combinedLoading });
   const handleViewComments = (comments) => openModal(modals.viewComments, { comments });
   const handleShowMessage = (title, message) => openModal(modals.messageModal, { title, message });
+  const handleClearAllWishlists = () =>
+    openModal(modals.clearWishlists, {
+      onConfirm: async (setModalLoading) => {
+        setModalLoading(true);
+        try {
+          await clearAllWishlists(users);
+          await fetchUsers(); // Refresh the user list
+          closeModal();
+        } catch (error) {
+          console.error('Error clearing wishlists:', error);
+          alert('Failed to clear wishlists');
+        } finally {
+          setModalLoading(false);
+        }
+      }
+    });
 
   /* ───────────── Render ───────────── */
   return (
@@ -162,6 +179,7 @@ const WishlistApp = () => {
               loading={combinedLoading}
               onAddUser={handleAddUser}
               onDeleteUser={handleDeleteUser}
+              onClearAllWishlists={handleClearAllWishlists}
             />
           )}
 

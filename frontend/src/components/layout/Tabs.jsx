@@ -7,10 +7,10 @@ const Tabs = ({ activeTab, setActiveTab, isAdmin }) => (
             {Object.values(tabs).map((tab) => (
                 shouldIncludeTab(tab, isAdmin) && (
                     <button
-                        key={tab.keyString}
-                        onClick={() => setActiveTab(tab.keyString)}
+                        key={tab.key}
+                        onClick={() => setActiveTab(tab.key)}
                         className={`px-4 py-2 rounded-t ${
-                            activeTab === tab.keyString
+                            activeTab === tab.key
                             ? 'bg-green-600 text-white'
                             : 'bg-gray-100'
                             }`}

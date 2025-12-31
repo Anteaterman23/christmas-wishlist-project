@@ -29,6 +29,7 @@ const LoginScreen = ({
                         onChange={(e) =>
                             setLoginData({ ...loginData, password: e.target.value })
                         }
+                        onKeyDown={(e) => { if (e.key === "Enter") verifyPassword(); }}
                         className="w-full px-3 py-2 border rounded-md"
                         disabled={loading || passwordVerified}
                     />
