@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, Plus, Trash2 } from 'lucide-react';
+import { guestName } from '../../utils/consts';
 
 const ManageGroup = ({
     users,
@@ -52,7 +53,9 @@ const ManageGroup = ({
                                 </td>
 
                                 <td className="p-3">
-                                    {user.wishlistCount}
+                                    {user.name !== guestName
+                                    ? user.wishlistCount
+                                    : "N/A"}
                                 </td>
 
                                 <td className="p-3 text-center">
