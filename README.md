@@ -23,6 +23,8 @@ When they enter the password, they can choose which family member to log in as, 
   - If you purchase any item off of someone’s wishlist, click “Mark as Purchased”
   - Any other user who views this item will see that it's been purchased and that you are the one who bought it
 
+<img width="800" height="423" alt="ezgif-7334c0dc5056c224" src="https://github.com/user-attachments/assets/c09cb732-4057-4491-9ab8-f2a767975822" />
+
 #### If logging in as guest:
 - You will not be able to create your own wishlist
 - However, you can still view others’ wishlists and mark items as purchased
@@ -35,9 +37,15 @@ _(Admin privileges require an admin password, reserved only for site maintainers
 
 ## Current Limitations
 
-#### Data is not encrypted at rest
-TODO: Fill in limitations
+#### No per-user authentication
+Because this website is only designed to be used by myself and my family, it is assumed that every user will only log in as themselves. This "honor system" style of login would ideally be replaced with a full account management system (complete with individual usernames and passwords for each user), but this felt like overkill for the scope of the project.
 
-## AI Disclosure
+#### Data is not encrypted at rest
+With the exception of passwords, which are hashed by `bcrypt`, all data is stored as plaintext in the database. This is generally acceptable since no data is particularly sensitive - it mostly consists of first names and wishlist items. Note that data should be encrypted in transit since Vercel enforces HTTPS (and TLS encodes JSON payloads).
+
+#### Insecure database configuration
+The MongoDB database is not configured with an IP allowlist, meaning it accepts traffic from any requester who can connect to it. This is not ideal, but because Vercel uses a dynamic range of IP addresses for outbound requests, it is difficult to configure so that only requests from this webapp are accepted. One workaround would be implementing Static IP's for Vercel, but this requires a Pro or Enterprise level account.
+
+## AI Usage Disclosure
 
 React components and backend code partially generated with Claude Sonnet. Initial prompt can be found [here](https://docs.google.com/document/d/1ppbutXd-JdTOSsvXGrD1cEDLBoFvb2FWu_Xzy6m7McE/edit).
