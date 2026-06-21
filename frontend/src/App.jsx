@@ -41,15 +41,6 @@ const WishlistApp = () => {
     closeModal
   } = useModal();
 
-  /* ───────────── Users ───────────── */
-  const {
-    users,
-    fetchUsers,
-    addUser,
-    deleteUser,
-    loading: userLoading
-  } = useUsers();
-
   /* ───────────── Auth ───────────── */
   const {
     isLoggedIn,
@@ -65,6 +56,15 @@ const WishlistApp = () => {
     handleLogin,
     logout,
   } = useAuth({ setActiveTab });
+
+  /* ───────────── Users ───────────── */
+  const {
+    users,
+    fetchUsers,
+    addUser,
+    deleteUser,
+    loading: userLoading
+  } = useUsers({ passwordVerified, verifiedAsAdmin });
 
   /* ───────────── Wishlist ───────────── */
   const {

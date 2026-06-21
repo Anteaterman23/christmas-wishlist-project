@@ -32,7 +32,7 @@ function requireAdmin(req, res, next) {
 }
 
 app.use(cors({
-  origin: FRONTEND_URL,
+  origin: new RegExp(FRONTEND_URL),
   optionsSuccessStatus: 200,
 }));
 

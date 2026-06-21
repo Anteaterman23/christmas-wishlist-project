@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { apiFetch } from "../utils/apiFetch";
 
-export const useUsers = () => {
+export const useUsers = ({passwordVerified, verifiedAsAdmin}) => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -21,10 +21,11 @@ export const useUsers = () => {
         }
     };
 
-    // Fetch users on mount
+    // Fetch users on mount when password is verified
     useEffect(() => {
+        if (!passwordVerified || verifiedAsAdmin) return;
         fetchUsers();
-    }, []);
+    }, [passwordVerified, verifiedAsAdmin]);
 
     const addUser = async (userName) => {
         if (!userName) return alert('User name is required');
