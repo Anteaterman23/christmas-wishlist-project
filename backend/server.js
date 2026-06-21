@@ -11,16 +11,16 @@ const app = express();
 
 const allowedOrigins = [
   process.env.FRONTEND_URL,
-  process.env.LOCALHOST_URL,
+  // process.env.LOCALHOST_URL,
 ];
 
 // Middleware
 app.use(cors({
   origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
+    if (!origin || !allowedOrigins.includes(origin)) {
       callback(new Error('Not allowed by CORS'));
+    } else {
+      callback(null, true);
     }
   },
   optionsSuccessStatus: 200,
