@@ -23,7 +23,7 @@ When they enter the password, they can choose which family member to log in as, 
   - If you purchase any item off of someone’s wishlist, click “Mark as Purchased”
   - Any other user who views this item will see that it's been purchased and that you are the one who bought it
 
-<img width="800" height="423" alt="ezgif-7334c0dc5056c224" src="https://github.com/user-attachments/assets/c09cb732-4057-4491-9ab8-f2a767975822" />
+<img width="960" height="540" alt="ezgif-808b736cf16dad27" src="https://github.com/user-attachments/assets/59fab91f-2e9f-413e-9c22-e6849fe58dcf" />
 
 #### If logging in as guest:
 - You will not be able to create your own wishlist
