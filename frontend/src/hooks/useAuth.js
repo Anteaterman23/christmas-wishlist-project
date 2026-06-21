@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { guestName, tabs } from '../utils/consts';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { apiFetch } from '../utils/apiFetch';
 
 export const useAuth = ({ setActiveTab }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -17,13 +16,15 @@ export const useAuth = ({ setActiveTab }) => {
         if (!loginData.password) return alert('Please enter a password');
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}/auth/login`, {
+            const res = await apiFetch('/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ password: loginData.password }),
             });
             const data = await res.json();
             if (!data.success) return alert('Invalid password');
+
+            localStorage.setItem('authToken', data.token);
 
             setPasswordVerified(true);
             setVerifiedAsAdmin(data.isAdmin);
@@ -58,6 +59,7 @@ export const useAuth = ({ setActiveTab }) => {
     };
 
     const logout = () => {
+        localStorage.removeItem('authToken');
         setIsLoggedIn(false);
         setCurrentUser(null);
         setCurrentUserId(null);

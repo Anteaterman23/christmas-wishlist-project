@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { capitalize } from '../../utils/capitalize';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { apiFetch } from '../../utils/apiFetch';
 
 const UpdatePasswords = ({ onShowMessage }) => {
     const [role, setRole] = useState('user');
@@ -34,7 +33,7 @@ const UpdatePasswords = ({ onShowMessage }) => {
 
         setLoading(true);
         try {
-            const response = await fetch(`${API_URL}/auth/update-password`, {
+            const response = await apiFetchetch(`/auth/update-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

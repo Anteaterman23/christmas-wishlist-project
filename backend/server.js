@@ -3,32 +3,43 @@ import express from 'express';
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import cors from 'cors';
+import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import dotenv from 'dotenv';
 dotenv.config();
 
+const { JWT_SECRET, FRONTEND_URL, MONGODB_URI } = process.env;
+
 const app = express();
 
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  // process.env.LOCALHOST_URL,
-];
-
 // Middleware
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // "Bearer TOKEN"
+
+  if (!token) return res.status(401).json({ error: 'No token, no entry' });
+
+  jwt.verify(token, JWT_SECRET, (err, payload) => {
+    if (err) return res.status(403).json({ error: 'Bad stamp' });
+    req.user = payload;
+    next();
+  });
+}
+
+function requireAdmin(req, res, next) {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  next();
+}
+
 app.use(cors({
-  origin(origin, callback) {
-    if (!origin || !allowedOrigins.includes(origin)) {
-      callback(new Error('Not allowed by CORS'));
-    } else {
-      callback(null, true);
-    }
-  },
+  origin: FRONTEND_URL,
   optionsSuccessStatus: 200,
 }));
+
 app.use(express.json());
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI, {
+mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
@@ -41,31 +52,31 @@ mongoose.connect(process.env.MONGODB_URI, {
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { password } = req.body;
-    
-    // Check admin password first
+
     const adminPassword = await Password.findOne({ role: 'admin' });
     const isAdmin = await bcrypt.compare(password, adminPassword.passwordHash);
-    
+
     if (isAdmin) {
-      return res.json({ success: true, isAdmin: true });
+      const token = jwt.sign({ role: 'admin' }, JWT_SECRET, { expiresIn: '4h' });
+      return res.json({ success: true, isAdmin: true, token });
     }
-    
-    // Check user password
+
     const userPassword = await Password.findOne({ role: 'user' });
     const isUser = await bcrypt.compare(password, userPassword.passwordHash);
-    
+
     if (isUser) {
-      return res.json({ success: true, isAdmin: false });
+      const token = jwt.sign({ role: 'user' }, JWT_SECRET, { expiresIn: '4h' });
+      return res.json({ success: true, isAdmin: false, token });
     }
-    
+
     return res.status(401).json({ success: false, message: 'Invalid password' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// Update passwords (admin only - you'd call this manually to change passwords)
-app.post('/api/auth/update-password', async (req, res) => {
+// Update passwords (admin only)
+app.post('/api/auth/update-password', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { role, oldPassword, newPassword } = req.body;
     
@@ -100,7 +111,7 @@ app.post('/api/auth/update-password', async (req, res) => {
 // ==================== USER ROUTES ====================
 
 // Get all users
-app.get('/api/users', async (req, res) => {
+app.get('/api/users', authenticateToken, async (req, res) => {
   try {
     const users = await User.find();
     
@@ -123,7 +134,7 @@ app.get('/api/users', async (req, res) => {
 });
 
 // Get single user by name
-app.get('/api/users/:name', async (req, res) => {
+app.get('/api/users/:name', authenticateToken, async (req, res) => {
   try {
     const user = await User.findOne({ name: req.params.name });
     if (!user) {
@@ -135,8 +146,8 @@ app.get('/api/users/:name', async (req, res) => {
   }
 });
 
-// Create new user
-app.post('/api/users', async (req, res) => {
+// Create new user (admin only)
+app.post('/api/users', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { name } = req.body;
     
@@ -162,8 +173,8 @@ app.post('/api/users', async (req, res) => {
   }
 });
 
-// Delete user
-app.delete('/api/users/:id', async (req, res) => {
+// Delete user (admin only)
+app.delete('/api/users/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     
@@ -186,7 +197,7 @@ app.delete('/api/users/:id', async (req, res) => {
 // ==================== WISHLIST ROUTES ====================
 
 // Get wishlist for a specific user
-app.get('/api/wishlist/:userId', async (req, res) => {
+app.get('/api/wishlist/:userId', authenticateToken, async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
     
@@ -205,7 +216,7 @@ app.get('/api/wishlist/:userId', async (req, res) => {
 });
 
 // Add item to user's wishlist
-app.post('/api/wishlist/:userId', async (req, res) => {
+app.post('/api/wishlist/:userId', authenticateToken, async (req, res) => {
   try {
     const { itemName, hyperlink, comments } = req.body;
     const userId = req.params.userId;
@@ -242,7 +253,7 @@ app.post('/api/wishlist/:userId', async (req, res) => {
 });
 
 // Delete wishlist item
-app.delete('/api/wishlist/:itemId', async (req, res) => {
+app.delete('/api/wishlist/:itemId', authenticateToken, async (req, res) => {
   try {
     const item = await WishlistItem.findOne({ itemId: req.params.itemId });
     
@@ -266,7 +277,7 @@ app.delete('/api/wishlist/:itemId', async (req, res) => {
 });
 
 // Update wishlist item
-app.put('/api/wishlist/:itemId', async (req, res) => {
+app.put('/api/wishlist/:itemId', authenticateToken, async (req, res) => {
   try {
     const { itemName, hyperlink, comments } = req.body;
     const item = await WishlistItem.findOne({ itemId: req.params.itemId });
@@ -289,7 +300,7 @@ app.put('/api/wishlist/:itemId', async (req, res) => {
 });
 
 // Toggle purchase status
-app.patch('/api/wishlist/:itemId/purchase', async (req, res) => {
+app.patch('/api/wishlist/:itemId/purchase', authenticateToken, async (req, res) => {
   try {
     const { purchasedBy } = req.body;
     const item = await WishlistItem.findOne({ itemId: req.params.itemId });

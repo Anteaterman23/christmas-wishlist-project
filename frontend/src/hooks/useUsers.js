@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { apiFetch } from "../utils/apiFetch";
 
 export const useUsers = () => {
     const [users, setUsers] = useState([]);
@@ -9,7 +8,9 @@ export const useUsers = () => {
     const fetchUsers = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}/users`);
+            const res = await apiFetch(`/users`, {
+                method: "GET"
+            });
             const data = await res.json();
             setUsers(data);
         } catch (err) {
@@ -29,7 +30,7 @@ export const useUsers = () => {
         if (!userName) return alert('User name is required');
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}/users`, {
+            const res = await apiFetch(`/users`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: userName }),
@@ -52,7 +53,7 @@ export const useUsers = () => {
         if (!userId) return;
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}/users/${userId}`, { method: 'DELETE' });
+            const res = await apiFetch(`/users/${userId}`, { method: 'DELETE' });
             if (res.ok) await fetchUsers();
             else alert('Failed to delete user');
         } catch (err) {

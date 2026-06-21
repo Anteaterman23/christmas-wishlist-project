@@ -1,11 +1,9 @@
-const API_URL = import.meta.env.VITE_API_URL;
-
 const clearWishlistByUserId = async (userId) => {
-    const res = await fetch(`${API_URL}/wishlist/${userId}`);
+    const res = await apiFetch(`$/wishlist/${userId}`);
     const wishlist = await res.json();
 
     const deletePromises = wishlist.map(async (item) => {
-        await fetch(`${API_URL}/wishlist/${item.itemId}`, {
+        await apiFetch(`/wishlist/${item.itemId}`, {
             method: 'DELETE',
         });
     });

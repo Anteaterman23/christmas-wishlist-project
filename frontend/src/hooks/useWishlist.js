@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { apiFetch } from '../utils/apiFetch';
 
 export const useWishlist = ({ currentUserId, currentUser, refreshUsers }) => {
     const [myWishlist, setMyWishlist] = useState([]);
@@ -14,7 +13,7 @@ export const useWishlist = ({ currentUserId, currentUser, refreshUsers }) => {
         const fetchMyWishlist = async () => {
             setLoading(true);
             try {
-                const res = await fetch(`${API_URL}/wishlist/${currentUserId}`);
+                const res = await apiFetch(`/wishlist/${currentUserId}`);
                 const data = await res.json();
                 setMyWishlist(data);
             } catch (err) {
@@ -33,7 +32,7 @@ export const useWishlist = ({ currentUserId, currentUser, refreshUsers }) => {
         if (!userId) return;
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}/wishlist/${userId}`);
+            const res = await apiFetch(`/wishlist/${userId}`);
             const data = await res.json();
             setOtherWishlist(data);
         } catch (err) {
@@ -51,7 +50,7 @@ export const useWishlist = ({ currentUserId, currentUser, refreshUsers }) => {
 
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}/wishlist/${currentUserId}`, {
+            const res = await apiFetch(`/wishlist/${currentUserId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ itemName: name, hyperlink: link, comments }),
@@ -59,7 +58,7 @@ export const useWishlist = ({ currentUserId, currentUser, refreshUsers }) => {
 
             if (!res.ok) return alert('Failed to add item');
 
-            const updatedRes = await fetch(`${API_URL}/wishlist/${currentUserId}`);
+            const updatedRes = await apiFetch(`/wishlist/${currentUserId}`);
             const data = await updatedRes.json();
             setMyWishlist(data);
 
@@ -79,7 +78,7 @@ export const useWishlist = ({ currentUserId, currentUser, refreshUsers }) => {
 
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}/wishlist/${itemId}`, {
+            const res = await apiFetch(`/wishlist/${itemId}`, {
                 method: 'DELETE',
             });
 
@@ -87,7 +86,7 @@ export const useWishlist = ({ currentUserId, currentUser, refreshUsers }) => {
 
             // Refresh wishlist
             if (currentUserId) {
-                const updatedRes = await fetch(`${API_URL}/wishlist/${currentUserId}`);
+                const updatedRes = await apiFetch(`/wishlist/${currentUserId}`);
                 const data = await updatedRes.json();
                 setMyWishlist(data);
 
@@ -109,7 +108,7 @@ export const useWishlist = ({ currentUserId, currentUser, refreshUsers }) => {
 
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}/wishlist/${itemId}`, {
+            const res = await apiFetch(`/wishlist/${itemId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ itemName: name, hyperlink: link, comments }),
@@ -119,7 +118,7 @@ export const useWishlist = ({ currentUserId, currentUser, refreshUsers }) => {
 
             // Refresh wishlist
             if (currentUserId) {
-                const updatedRes = await fetch(`${API_URL}/wishlist/${currentUserId}`);
+                const updatedRes = await apiFetch(`/wishlist/${currentUserId}`);
                 const data = await updatedRes.json();
                 setMyWishlist(data);
             }
@@ -137,7 +136,7 @@ export const useWishlist = ({ currentUserId, currentUser, refreshUsers }) => {
 
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}/wishlist/${itemId}/purchase`, {
+            const res = await apiFetch(`/wishlist/${itemId}/purchase`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ purchasedBy: currentUser }),
