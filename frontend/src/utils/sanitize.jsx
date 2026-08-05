@@ -1,6 +1,6 @@
 import { urlRegex } from "./consts";
 
-export function sanitize({ itemName, itemHyperlink }) {
+export function sanitize(itemName, itemHyperlink) {
   const url = extractURL(itemHyperlink);
   
   if (!url) {
