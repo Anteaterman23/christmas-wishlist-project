@@ -49,7 +49,7 @@ const OtherWishlist = ({
                                     }`}
                             >
                                 <td className="p-3">
-                                    {sanitize(item.name, item.hyperlink)}
+                                    {sanitize(item.itemName, item.hyperlink)}
                                 </td>
 
                                 <td className="p-3">

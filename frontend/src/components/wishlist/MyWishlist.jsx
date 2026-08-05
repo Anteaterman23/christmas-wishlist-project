@@ -27,7 +27,7 @@ const MyWishlist = ({ items, onAdd, onEdit, onDelete, onViewComments, loading })
                     {items.map((item) => (
                         <tr key={item.itemId} className="border-b hover:bg-gray-50">
                             <td className="p-3">
-                                {sanitize(item.name, item.hyperlink)}
+                                {sanitize(item.itemName, item.hyperlink)}
                             </td>
                             <td className="p-3">
                                 {item.comments && (
