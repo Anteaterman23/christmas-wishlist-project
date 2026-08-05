@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { ensureHttps } from '../../utils/ensureHttps';
+import { sanitize } from '../../utils/sanitize';
 
 const OtherWishlist = ({
     user,
@@ -49,18 +49,7 @@ const OtherWishlist = ({
                                     }`}
                             >
                                 <td className="p-3">
-                                    {item.hyperlink ? (
-                                        <a
-                                            href={ensureHttps(item.hyperlink)}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-blue-600 hover:underline"
-                                        >
-                                            {item.itemName}
-                                        </a>
-                                    ) : (
-                                        <span>{item.itemName}</span>
-                                    )}
+                                    {sanitize(item.name, item.hyperlink)}
                                 </td>
 
                                 <td className="p-3">

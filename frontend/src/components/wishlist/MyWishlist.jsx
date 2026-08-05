@@ -1,5 +1,5 @@
 import { X, Plus, Pencil } from 'lucide-react';
-import { ensureHttps } from '../../utils/ensureHttps';
+import { sanitize } from '../../utils/sanitize';
 
 const MyWishlist = ({ items, onAdd, onEdit, onDelete, onViewComments, loading }) => (
     <div className="max-w-6xl mx-auto p-6">
@@ -27,18 +27,7 @@ const MyWishlist = ({ items, onAdd, onEdit, onDelete, onViewComments, loading })
                     {items.map((item) => (
                         <tr key={item.itemId} className="border-b hover:bg-gray-50">
                             <td className="p-3">
-                                {item.hyperlink ? (
-                                    <a 
-                                        href={ensureHttps(item.hyperlink)} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        className="text-blue-600 hover:underline"
-                                    >
-                                        {item.itemName}
-                                    </a>
-                                ) : (
-                                    <span>{item.itemName}</span>
-                                )}
+                                {sanitize(item.name, item.hyperlink)}
                             </td>
                             <td className="p-3">
                                 {item.comments && (
