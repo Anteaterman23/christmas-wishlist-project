@@ -6,7 +6,12 @@ export function sanitize(itemName, itemHyperlink) {
   if (!url) {
     return <span>{itemName}</span>;
   }
-  return <a href={url}>{itemName}</a>;
+  return <a 
+    href={url} 
+    target="_blank" 
+    rel="noopener noreferrer"
+    className="text-blue-600 hover:underline"
+  >{itemName}</a>
 }
 
 const extractURL = (str) => {
