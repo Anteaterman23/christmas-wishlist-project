@@ -2,20 +2,21 @@ import { urlRegex } from "./consts";
 
 export function sanitize(itemName, itemHyperlink) {
   const url = extractURL(itemHyperlink);
+  const name = String(itemName).trim();
   
   if (!url) {
-    return <span>{itemName}</span>;
+    return <span>{name}</span>;
   }
-  return <a 
+  return <a
     href={url} 
     target="_blank" 
     rel="noopener noreferrer"
     className="text-blue-600 hover:underline"
-  >{itemName}</a>
+  >{name}</a>
 }
 
-const extractURL = (str) => {
-    if (!str) return undefined;
-    const match = str.match(urlRegex)
-    return match ? match[0] : undefined;
-};
+function extractURL(str) {
+  if (!str) return undefined;
+  const match = str.match(urlRegex);
+  return match ? match[0] : undefined;
+}
