@@ -35,3 +35,5 @@ export const modals = {
 };
 
 export const urlRegex = /https?:\/\/(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.([a-zA-Z]{2,})(?:\/[^\s]*)*/g;
+
+export const userSortOrder = ["George", "Michelle", "Nick", "Ali", "Tyler", "Misha", "Brandon", "GUEST"];

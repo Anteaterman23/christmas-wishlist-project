@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { apiFetch } from "../utils/apiFetch";
+import { userSortOrder } from '../utils/consts';
 
 export const useUsers = ({passwordVerified, verifiedAsAdmin}) => {
     const [users, setUsers] = useState([]);
@@ -12,6 +13,17 @@ export const useUsers = ({passwordVerified, verifiedAsAdmin}) => {
                 method: "GET"
             });
             const data = await res.json();
+            data.sort((a, b) => {
+                const indexA = userSortOrder.indexOf(a.name);
+                const indexB = userSortOrder.indexOf(b.name);
+
+                // Items not in the list go to the end, sorted alphabetically
+                if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+                if (indexA === -1) return 1;
+                if (indexB === -1) return -1;
+
+                return indexA - indexB;
+            });
             setUsers(data);
         } catch (err) {
             console.error('Error fetching users:', err);
