@@ -12,7 +12,7 @@ export function sanitize(itemName, itemHyperlink) {
     target="_blank" 
     rel="noopener noreferrer"
     className="text-blue-600 hover:underline"
-  >{name}</a>
+  >{name}</a>;
 }
 
 function extractURL(str) {
