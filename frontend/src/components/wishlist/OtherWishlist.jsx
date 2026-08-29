@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { sanitize } from '../../utils/sanitize';
+import { StarIndicator } from './StarButton'; // adjust path to wherever you place it
 
 const OtherWishlist = ({
     user,
@@ -11,6 +12,8 @@ const OtherWishlist = ({
     onTogglePurchase,
     onViewComments
 }) => {
+    const hasStarredItems = wishlist.some((item) => item.isStarred);
+
     return (
         <div className="max-w-6xl mx-auto p-6">
             <button
@@ -29,6 +32,7 @@ const OtherWishlist = ({
                 <table className="w-full">
                     <thead className="bg-gray-100 border-b">
                         <tr>
+                            {hasStarredItems && <th className="p-3 w-10"></th>}
                             <th className="text-left p-3 font-semibold text-gray-700">
                                 Item Name
                             </th>
@@ -48,6 +52,12 @@ const OtherWishlist = ({
                                 className={`border-b ${item.purchased ? 'bg-red-50' : 'hover:bg-gray-50'
                                     }`}
                             >
+                                {hasStarredItems && (
+                                    <td className="p-3 text-center">
+                                        <StarIndicator starred={item.isStarred} />
+                                    </td>
+                                )}
+
                                 <td className="p-3">
                                     {sanitize(item.itemName, item.hyperlink)}
                                 </td>
@@ -98,7 +108,7 @@ const OtherWishlist = ({
                         {wishlist.length === 0 && (
                             <tr>
                                 <td
-                                    colSpan="3"
+                                    colSpan={hasStarredItems ? 4 : 3}
                                     className="p-8 text-center text-gray-500"
                                 >
                                     No items on this wishlist yet.

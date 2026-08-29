@@ -74,6 +74,7 @@ const WishlistApp = () => {
     addWishlistItem,
     deleteWishlistItem,
     updateWishlistItem,
+    toggleStar,
     togglePurchase,
     fetchOtherWishlist,
   } = useWishlist({ currentUserId, currentUser, refreshUsers: fetchUsers });
@@ -146,6 +147,7 @@ const WishlistApp = () => {
               onAdd={handleAddItem}
               onEdit={handleEditItem}
               onDelete={handleDeleteItem}
+              onToggleStar={toggleStar}
               onViewComments={handleViewComments}
             />
           )}
