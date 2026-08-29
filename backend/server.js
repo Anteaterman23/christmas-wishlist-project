@@ -253,7 +253,7 @@ app.post('/api/wishlist/:userId', authenticateToken, async (req, res) => {
 });
 
 // Toggle star status
-app.patch('/api/wishlist/:itemId/star', async (req, res) => {
+app.patch('/api/wishlist/:itemId/star', authenticateToken, async (req, res) => {
   try {
     const item = await WishlistItem.findOne({ itemId: req.params.itemId });
 
