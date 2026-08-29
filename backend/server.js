@@ -252,6 +252,24 @@ app.post('/api/wishlist/:userId', authenticateToken, async (req, res) => {
   }
 });
 
+// Toggle star status
+app.patch('/api/wishlist/:itemId/star', async (req, res) => {
+  try {
+    const item = await WishlistItem.findOne({ itemId: req.params.itemId });
+
+    if (!item) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+
+    item.isStarred = !item.isStarred;
+    await item.save();
+
+    res.json(item);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Delete wishlist item
 app.delete('/api/wishlist/:itemId', authenticateToken, async (req, res) => {
   try {

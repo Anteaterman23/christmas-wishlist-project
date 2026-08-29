@@ -1,7 +1,8 @@
 import { X, Plus, Pencil } from 'lucide-react';
 import { sanitize } from '../../utils/sanitize';
+import StarButton from './StarButton';
 
-const MyWishlist = ({ items, onAdd, onEdit, onDelete, onViewComments, loading }) => (
+const MyWishlist = ({ items, onAdd, onEdit, onDelete, onToggleStar, onViewComments, loading }) => (
     <div className="max-w-6xl mx-auto p-6">
         <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-gray-800">Your Wishlist</h2>
@@ -18,6 +19,7 @@ const MyWishlist = ({ items, onAdd, onEdit, onDelete, onViewComments, loading })
             <table className="w-full">
                 <thead className="bg-gray-100 border-b">
                     <tr>
+                        <th className="p-3 w-10"></th>
                         <th className="text-left p-3 font-semibold text-gray-700">Item Name</th>
                         <th className="text-left p-3 font-semibold text-gray-700">Comments</th>
                         <th className="text-center p-3 font-semibold text-gray-700">Actions</th>
@@ -26,6 +28,12 @@ const MyWishlist = ({ items, onAdd, onEdit, onDelete, onViewComments, loading })
                 <tbody>
                     {items.map((item) => (
                         <tr key={item.itemId} className="border-b hover:bg-gray-50">
+                            <td className="p-3 text-center">
+                                <StarButton
+                                    starred={item.isStarred}
+                                    onToggle={() => onToggleStar(item.itemId)}
+                                />
+                            </td>
                             <td className="p-3">
                                 {sanitize(item.itemName, item.hyperlink)}
                             </td>
@@ -63,7 +71,7 @@ const MyWishlist = ({ items, onAdd, onEdit, onDelete, onViewComments, loading })
                     ))}
                     {items.length === 0 && (
                         <tr>
-                            <td colSpan="3" className="p-8 text-center text-gray-500">
+                            <td colSpan="4" className="p-8 text-center text-gray-500">
                                 No items yet. Click Add Item to start your wishlist!
                             </td>
                         </tr>

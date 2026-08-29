@@ -13,6 +13,7 @@ const wishlistItemSchema = new mongoose.Schema({
   itemName: { type: String, required: true },
   hyperlink: { type: String, default: '' },
   comments: { type: String, default: '' },
+  isStarred: { type: Boolean, default: false },
   purchased: { type: Boolean, default: false },
   purchasedBy: { type: String, default: null },
   ownerId: { type: String, required: true } // Reference to user ID

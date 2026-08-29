@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { apiFetch } from '../utils/apiFetch';
+import { sortByStar } from '../utils/star';
 
 export const useWishlist = ({ currentUserId, currentUser, refreshUsers }) => {
     const [myWishlist, setMyWishlist] = useState([]);
@@ -15,7 +16,7 @@ export const useWishlist = ({ currentUserId, currentUser, refreshUsers }) => {
             try {
                 const res = await apiFetch(`/wishlist/${currentUserId}`);
                 const data = await res.json();
-                setMyWishlist(data);
+                setMyWishlist(sortByStar(data));
             } catch (err) {
                 console.error('Error fetching wishlist:', err);
                 alert('Failed to load wishlist');
@@ -34,7 +35,7 @@ export const useWishlist = ({ currentUserId, currentUser, refreshUsers }) => {
         try {
             const res = await apiFetch(`/wishlist/${userId}`);
             const data = await res.json();
-            setOtherWishlist(data);
+            setOtherWishlist(sortByStar(data));
         } catch (err) {
             console.error('Error fetching other wishlist:', err);
             alert('Failed to load wishlist');
@@ -60,7 +61,7 @@ export const useWishlist = ({ currentUserId, currentUser, refreshUsers }) => {
 
             const updatedRes = await apiFetch(`/wishlist/${currentUserId}`);
             const data = await updatedRes.json();
-            setMyWishlist(data);
+            setMyWishlist(sortByStar(data));
 
             // Refresh user counts
             if (refreshUsers) await refreshUsers();
@@ -88,7 +89,7 @@ export const useWishlist = ({ currentUserId, currentUser, refreshUsers }) => {
             if (currentUserId) {
                 const updatedRes = await apiFetch(`/wishlist/${currentUserId}`);
                 const data = await updatedRes.json();
-                setMyWishlist(data);
+                setMyWishlist(sortByStar(data));
 
                 // Refresh user counts
                 if (refreshUsers) await refreshUsers();
@@ -120,7 +121,7 @@ export const useWishlist = ({ currentUserId, currentUser, refreshUsers }) => {
             if (currentUserId) {
                 const updatedRes = await apiFetch(`/wishlist/${currentUserId}`);
                 const data = await updatedRes.json();
-                setMyWishlist(data);
+                setMyWishlist(sortByStar(data));
             }
         } catch (err) {
             console.error('Error updating item:', err);
@@ -130,7 +131,44 @@ export const useWishlist = ({ currentUserId, currentUser, refreshUsers }) => {
         }
     };
 
-    // Toggle purchase status on another user's wishlist
+    // Toggle star status (no modal, direct action from the list)
+    const toggleStar = async (itemId) => {
+        if (!itemId) return;
+
+        // Optimistic update so it feels instant
+        setMyWishlist((prev) =>
+            sortByStar(
+                prev.map((item) =>
+                    item.itemId === itemId ? { ...item, isStarred: !item.isStarred } : item
+                )
+            )
+        );
+
+        try {
+            const res = await apiFetch(`/wishlist/${itemId}/star`, {
+                method: 'PATCH',
+            });
+
+            if (!res.ok) throw new Error('Failed to toggle star');
+
+            // Reconcile with server response in case of race conditions
+            if (currentUserId) {
+                const updatedRes = await apiFetch(`/wishlist/${currentUserId}`);
+                const data = await updatedRes.json();
+                setMyWishlist(sortByStar(data));
+            }
+        } catch (err) {
+            console.error('Error toggling star:', err);
+            alert('Failed to update star');
+            // Revert on failure by refetching
+            if (currentUserId) {
+                const updatedRes = await apiFetch(`/wishlist/${currentUserId}`);
+                const data = await updatedRes.json();
+                setMyWishlist(sortByStar(data));
+            }
+        }
+    };
+
     const togglePurchase = async (itemId, selectedUserId) => {
         if (!itemId || !selectedUserId) return;
 
@@ -162,6 +200,7 @@ export const useWishlist = ({ currentUserId, currentUser, refreshUsers }) => {
         addWishlistItem,
         deleteWishlistItem,
         updateWishlistItem,
+        toggleStar,
         togglePurchase,
     };
 };
